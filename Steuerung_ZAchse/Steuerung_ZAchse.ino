@@ -13,7 +13,7 @@
  * Befehle die über die serielle Schnittstelle gesendet werden können: 
  * F      -> Fokusiert den Laser
  * M      -> Fährt auf Mittelposition
- * DXXXX  -> Stellt Drehmodul auf den eingegebenen Winkel ein (Gon, 0-399, sonst Umrechnung)
+ * DXXXX  -> Stellt Drehmodul auf den eingegebenen Winkel ein (Gon, 0-399, sonst umrechnung
  * PXXXXX -> Bewegt die Z-Achse auf die entsprechende Position. Arbeitsbereich 0 - 72000
  */
 
@@ -89,6 +89,8 @@ recvWithEndMarker();
 spliReceivedMessage();
 
 if(newData == true){
+  newData = false;
+  
   switch(index){
     
     case 'M':
@@ -96,7 +98,6 @@ if(newData == true){
       Serial.println("<Fahre auf Mittelposition...>");
       moveZToPosition(36000);
       Serial.println("<Auf Mittelposition gesetzt>");
-      newData = false;
       break;
       
     case 'F':
@@ -106,7 +107,6 @@ if(newData == true){
       Serial.print("<Laser fokusiert, Distanz zum Boden: ");
       Serial.print(distance);
       Serial.println(" mm>");
-      newData = false;
       break;
       
     case 'P':
@@ -116,7 +116,6 @@ if(newData == true){
       Serial.print("<Auf Position ");
       Serial.print(numValue);
       Serial.println(" gesetzt>");
-      newData = false;
       break;
 
     case 'D':
@@ -126,13 +125,11 @@ if(newData == true){
       Serial.print("<Drehmodul ausgerichtet auf ");
       Serial.print(numValue);
       Serial.println(" gon>");
-      newData = false;
       break;
      
     default:
       // Wenn Befehl nicht bekannt.
       Serial.println("<ERROR: Befehl nicht bekannt...>");
-      newData = false;
       break;
 
       
