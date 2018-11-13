@@ -15,6 +15,7 @@
  * M      -> Fährt auf Mittelposition
  * DXXXX  -> Stellt Drehmodul auf den eingegebenen Winkel ein (Gon, 0-399, sonst umrechnung
  * PXXXXX -> Bewegt die Z-Achse auf die entsprechende Position. Arbeitsbereich 0 - 72000
+ * T      -> Bewegung auf Trigger Position
  */
 
 #include <AccelStepper.h>
@@ -72,11 +73,7 @@ void setup() {
     stepperZ.setEnablePin(sleepPinZ);
     stepperZ.disableOutputs();
 
-    moveZToTrigger();                   // Fahren bis zum Trigger
-    stepperZ.setCurrentPosition(-100);  // Position Setzen
-    delay(500);
-      
-    moveZToPosition(36000);             // Mittelposition
+    
     
     Serial.println("<Arduini Z-Achse initialisiert...>");
     
@@ -125,6 +122,15 @@ if(newData == true){
       Serial.print("<Drehmodul ausgerichtet auf ");
       Serial.print(numValue);
       Serial.println(" gon>");
+      break;
+
+    case 'T':
+      // Bewege Z-Achse auf Trigger Position
+      moveZToTrigger();                   // Fahren bis zum Trigger
+      stepperZ.setCurrentPosition(-100);  // Position Setzen
+      delay(500);
+      
+    moveZToPosition(36000);             // Mittelposition
       break;
      
     default:
