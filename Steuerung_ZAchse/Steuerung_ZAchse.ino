@@ -75,7 +75,7 @@ void setup() {
 
     
     
-    Serial.println("<Arduini Z-Achse initialisiert...>");
+    Serial.println("<Arduini Z-Achse bereit.>");
     
     
 }
@@ -92,50 +92,44 @@ if(newData == true){
     
     case 'M':
       // Fahre auf Mittelposition
-      Serial.println("<Fahre auf Mittelposition...>");
       moveZToPosition(36000);
-      Serial.println("<Auf Mittelposition gesetzt>");
+      Serial.println("Z ok [M] - Auf Mittelposition gefahren.");
       break;
       
     case 'F':
       // Fokusiere Laser (enstspricht Fahre auf festgesetzte Höhe: 150 mm)
-      Serial.println("<Fokusiere...>");
       moveToSpecificHight(150);
-      Serial.print("<Laser fokusiert, Distanz zum Boden: ");
-      Serial.print(distance);
-      Serial.println(" mm>");
+      Serial.println("Z ok [F] - Laser fokusiert");
       break;
       
     case 'P':
       // Fahre auf die eingegebene Position
-
       moveZToPosition(numValue);
-      Serial.print("<Auf Position ");
+      Serial.print("Z ok [P] - Auf Position ");
       Serial.print(numValue);
-      Serial.println(" gesetzt>");
+      Serial.println(" gefahren.");
       break;
 
     case 'D':
       // Bewege Drehmodul auf die entsprechende Winkeleinstellung
-      Serial.println("<Richte Drehmodul aus...>");
       drehmodulZuWinkel(numValue);
-      Serial.print("<Drehmodul ausgerichtet auf ");
+      Serial.print("Z ok [D] - Drehmodul ausgerichtet auf ");
       Serial.print(numValue);
-      Serial.println(" gon>");
+      Serial.println(" gon");
       break;
 
     case 'T':
       // Bewege Z-Achse auf Trigger Position
       moveZToTrigger();                   // Fahren bis zum Trigger
       stepperZ.setCurrentPosition(-100);  // Position Setzen
-      delay(500);
-      
-    moveZToPosition(36000);             // Mittelposition
+      delay(500);      
+      moveZToPosition(36000);             // Mittelposition
+      Serial.println("Z ok [T] - Arbeitsbereich festgelegt.");
       break;
      
     default:
       // Wenn Befehl nicht bekannt.
-      Serial.println("<ERROR: Befehl nicht bekannt...>");
+      Serial.println("Z ERROR: Befehl nicht bekannt...");
       break;
 
       
