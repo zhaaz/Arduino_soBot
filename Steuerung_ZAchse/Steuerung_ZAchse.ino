@@ -75,7 +75,7 @@ void setup() {
 
     
     
-    Serial.println("<Arduini Z-Achse bereit.>");
+    Serial.println("Z bereit");
     
     
 }
