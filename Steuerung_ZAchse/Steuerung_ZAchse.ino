@@ -14,6 +14,7 @@
  * F      -> Fokusiert den Laser
  * M      -> Fährt auf Mittelposition
  * DXXXX  -> Stellt Drehmodul auf den eingegebenen Winkel ein (Gon, 0-399, sonst umrechnung
+ * UXXXX  -> Relative Drehung Drehmodul
  * PXXXXX -> Bewegt die Z-Achse auf die entsprechende Position. Arbeitsbereich 0 - 72000
  * T      -> Bewegung auf Trigger Position
  */
@@ -118,6 +119,14 @@ if(newData == true){
       Serial.println(" gon");
       break;
 
+    case 'U':
+      // Move Drehmodul um Winkel
+      Serial.print("U");
+      Serial.println(numValue);  
+      drehmodulRelativ(numValue);
+      Serial.println("ok");
+      break;
+      
     case 'T':
       // Bewege Z-Achse auf Trigger Position
       moveZToTrigger();                   // Fahren bis zum Trigger
@@ -214,6 +223,25 @@ void moveDrehmodul(long newPos){
     }
     stepperDreh.disableOutputs();
 }
+
+void moveDrehmodulRel(long moveRel){
+    stepperDreh.enableOutputs();
+    stepperDreh.move(moveRel);
+    stepperDreh.setSpeed(600);
+    long startPos = stepperDreh.currentPosition();
+    
+    while(true){
+      stepperDreh.runSpeedToPosition();
+      if(stepperDreh.currentPosition() == startPos + moveRel)
+      break;
+    }
+    stepperDreh.disableOutputs();
+}
+
+void drehmodulRelativ(int arcRelativ){
+  moveDrehmodulRel(arcRelativ*8);
+}
+  
 
 void drehmodulZuWinkel(int newArc){         // Drehmodul auf Winkel bewegen (ganze Winkel zwischen 0 und 399 gon)
   if(newArc > 400){
