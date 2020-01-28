@@ -4,17 +4,18 @@
  * 26.10.2018
  * 
  * Distanzmessung funktioniert, 
- * ZAchse Bewegen funktioniert, auf Schalter fahren auch. 800 Steps entsprechen ca 1 mm.
- * Arbeitsbereich ZAchse: 0 - 72000 Steps. 0 oben, 72000 unten.
- * Drehmodul: 1 Umdrehung = 200*16 Steps = 3200 Schritte. 1 gon entspricht 8 Schritte
+ * ZAchse Bewegen funktioniert, auf Schalter fahren auch. 
+ * Arbeitsbereich ZAchse: 0 - 9000 Steps. 0 oben, 9000 unten.
+ * Drehmodul: 1 Umdrehung = 200*2 Steps = 400 Schritte. 1 gon entspricht 1 Schritte
+ * Aber: Getriebe 1:13,74
  * 
  * Initialisierung: Anfahren von Schalterposition um Arbeitsbereich festzulegen
  * 
  * Befehle die über die serielle Schnittstelle gesendet werden können: 
- * F      -> Fokusiert den Laser (auf Abstand von 150 mm)
+ * FXXX    -> Fokusiert den Laser auf Abstand von XXX mm)
  * M      -> Fährt auf Mittelposition
- * UXXXX  -> Relative Drehung Drehmodul (in Gon)
- * PXXXXX -> Bewegt die Z-Achse auf die entsprechende Position. Arbeitsbereich 0 - 72000
+ * RXXXX  -> Relative Drehung Drehmodul (in Gon)
+ * PXXXXX -> Bewegt die Z-Achse auf die entsprechende Position. Arbeitsbereich 0 - 9000
  * T      -> Bewegung auf Trigger Position
  */
 
@@ -67,11 +68,11 @@ void setup() {
     stepperDreh.setCurrentPosition(0);
     
     // Z-Achse
-    stepperZ.setMaxSpeed(2000);
-    stepperZ.setAcceleration(2000);
+    stepperZ.setMaxSpeed(1200);
+    stepperZ.setAcceleration(600);
     stepperZ.setSpeed(-3600);
     stepperZ.setEnablePin(sleepPinZ);
-    stepperZ.disableOutputs();
+    // stepperZ.disableOutputs();
 
     
     
@@ -92,13 +93,13 @@ if(newData == true){
     
     case 'M':
       // Fahre auf Mittelposition
-      moveZToPosition(36000);
+      moveZToPosition(4500);
       Serial.println("Z ok [M] - Auf Mittelposition gefahren.");
       break;
       
     case 'F':
       // Fokusiere Laser (enstspricht Fahre auf festgesetzte Höhe: 150 mm)
-      moveToSpecificHight(150);
+      moveToSpecificHight(numValue);
       Serial.println("Z ok [F] - Laser fokusiert");
       break;
       
@@ -113,18 +114,21 @@ if(newData == true){
 
     case 'R':
       // Move Drehmodul um Winkel (Relativ zur aktuellen Position)
-      Serial.print("U");
+      Serial.print("R");
       Serial.println(numValue);  
-      drehmodulRelativ(numValue);
+      stepperDreh.enableOutputs();
+      stepperDreh.setCurrentPosition(0);   
+      stepperDreh.runToNewPosition((int) -(numValue*13.74));
+      stepperDreh.disableOutputs();
       Serial.println("ok");
       break;
       
     case 'T':
       // Bewege Z-Achse auf Trigger Position
       moveZToTrigger();                   // Fahren bis zum Trigger
-      stepperZ.setCurrentPosition(-100);  // Position Setzen
+      stepperZ.setCurrentPosition(-25);  // Position Setzen
       delay(500);      
-      moveZToPosition(36000);             // Mittelposition
+      moveZToPosition(4500);             // Mittelposition
       Serial.println("Z ok [T] - Arbeitsbereich festgelegt.");
       break;
      
@@ -166,7 +170,7 @@ float distMeasurement(int numberOfMeasurements){
 }
 
 void moveZToPosition(long newPosition){
-  if(newPosition < 72001 && newPosition > -1){   // Nur wenn innerhalb von Arbeitsbereich
+  if(newPosition < 9001 && newPosition > -1){   // Nur wenn innerhalb von Arbeitsbereich
     stepperZ.enableOutputs();
     stepperZ.runToNewPosition(newPosition);
     stepperZ.run();
@@ -196,7 +200,7 @@ void moveToSpecificHight(int specHight){
   // SpecHight in mm
   float actualHight = distMeasurement(10);
   float deltaHight = specHight - actualHight;
-  long stepsToGo = long(deltaHight)*800;
+  long stepsToGo = long(deltaHight)*100;    // davor 800 mit 16el steps
   long actualStepPosition = stepperZ.currentPosition();
   long newPosition = actualStepPosition - stepsToGo;
   moveZToPosition(newPosition);
@@ -218,10 +222,7 @@ void moveDrehmodul(long newPos){
 
 
 
-void drehmodulRelativ(int arcRelativ){
-  stepperDreh.setCurrentPosition(0);   
-  stepperDreh.runToNewPosition((int) -(numValue*13.74));
-}
+
   
 
 // Für serielle Kommunikation
