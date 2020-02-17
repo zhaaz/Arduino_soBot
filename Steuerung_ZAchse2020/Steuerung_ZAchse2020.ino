@@ -61,8 +61,8 @@ void setup() {
     Serial.begin(19200);
     
     // Drehmodul 
-    stepperDreh.setMaxSpeed(1800);
-    stepperDreh.setAcceleration(1200);
+    stepperDreh.setMaxSpeed(3000);
+    stepperDreh.setAcceleration(6000);
     stepperDreh.setEnablePin(sleepPinDreh);
     stepperDreh.disableOutputs();
     stepperDreh.setCurrentPosition(0);
@@ -210,7 +210,7 @@ void moveToSpecificHight(int specHight){
 void moveDrehmodul(long newPos){
     stepperDreh.enableOutputs();
     stepperDreh.moveTo(newPos);
-    stepperDreh.setSpeed(600);
+    stepperDreh.setSpeed(3000);
     
     while(true){
       stepperDreh.runSpeedToPosition();
