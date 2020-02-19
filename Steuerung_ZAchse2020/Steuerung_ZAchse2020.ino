@@ -46,6 +46,7 @@ char index;
 long numValue; 
 
 bool newData = false;
+int vDreh = 2000;
 
 int actualArc = 0; // Gon
 
@@ -61,8 +62,8 @@ void setup() {
     Serial.begin(19200);
     
     // Drehmodul 
-    stepperDreh.setMaxSpeed(3000);
-    stepperDreh.setAcceleration(6000);
+    stepperDreh.setMaxSpeed(vDreh);
+    stepperDreh.setAcceleration(4000);
     stepperDreh.setEnablePin(sleepPinDreh);
     stepperDreh.disableOutputs();
     stepperDreh.setCurrentPosition(0);
@@ -90,6 +91,15 @@ if(newData == true){
   newData = false;
   
   switch(index){
+
+
+    case 'V':
+      // Fahre auf Mittelposition
+      Serial.println("vDreh gesetzt");
+      vDreh = numValue;
+      stepperDreh.setMaxSpeed(vDreh);
+      break;
+
     
     case 'M':
       // Fahre auf Mittelposition
@@ -113,14 +123,13 @@ if(newData == true){
 
 
     case 'R':
-      // Move Drehmodul um Winkel (Relativ zur aktuellen Position)
-      Serial.print("R");
-      Serial.println(numValue);  
+      // Move Drehmodul um Winkel (Relativ zur aktuellen Position) 
       stepperDreh.enableOutputs();
       stepperDreh.setCurrentPosition(0);   
       stepperDreh.runToNewPosition((int) -(numValue*13.74));
       stepperDreh.disableOutputs();
-      Serial.println("ok");
+      Serial.println("okay");
+      
       break;
       
     case 'T':
@@ -210,11 +219,12 @@ void moveToSpecificHight(int specHight){
 void moveDrehmodul(long newPos){
     stepperDreh.enableOutputs();
     stepperDreh.moveTo(newPos);
-    stepperDreh.setSpeed(3000);
+    stepperDreh.setSpeed(4000);
     
     while(true){
       stepperDreh.runSpeedToPosition();
       if(stepperDreh.currentPosition() == newPos)
+      //Serial.println("ReachedNewPos");
       break;
     }
     stepperDreh.disableOutputs();
