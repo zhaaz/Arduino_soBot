@@ -46,9 +46,10 @@ char index;
 long numValue; 
 
 bool newData = false;
-int vDreh = 2000;
+long vDreh = 4000;
+long accelDreh = 4000;
 
-int actualArc = 0; // Gon
+long actualArc = 0; // Gon
 
 
 void setup() {
@@ -63,7 +64,7 @@ void setup() {
     
     // Drehmodul 
     stepperDreh.setMaxSpeed(vDreh);
-    stepperDreh.setAcceleration(4000);
+    stepperDreh.setAcceleration(accelDreh);
     stepperDreh.setEnablePin(sleepPinDreh);
     stepperDreh.disableOutputs();
     stepperDreh.setCurrentPosition(0);
@@ -92,6 +93,13 @@ if(newData == true){
   
   switch(index){
 
+
+    case 'A':
+
+      Serial.println("accelDreh gesetzt");
+      accelDreh = numValue;
+      stepperDreh.setAcceleration(accelDreh);
+      break;
 
     case 'V':
       // Fahre auf Mittelposition
@@ -126,7 +134,8 @@ if(newData == true){
       // Move Drehmodul um Winkel (Relativ zur aktuellen Position) 
       stepperDreh.enableOutputs();
       stepperDreh.setCurrentPosition(0);   
-      stepperDreh.runToNewPosition((int) -(numValue*13.74));
+      stepperDreh.runToNewPosition((long) -(numValue*13.74));
+     // stepperDreh.runToNewPosition((long) -(numValue));     
       stepperDreh.disableOutputs();
       Serial.println("okay");
       
@@ -134,6 +143,7 @@ if(newData == true){
       
     case 'T':
       // Bewege Z-Achse auf Trigger Position
+      stepperZ.setSpeed(-3600);
       moveZToTrigger();                   // Fahren bis zum Trigger
       stepperZ.setCurrentPosition(-25);  // Position Setzen
       delay(500);      
